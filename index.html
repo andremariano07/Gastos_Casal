@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f7f4ed" />
+    <title>Nosso Plano — Finanças do casal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="auth-locked">
+    <div class="app-shell">
+      <aside class="sidebar" id="sidebar">
+        <a class="brand" href="#" aria-label="Nosso Plano">
+          <span class="brand-mark">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7.2 4.5a4.7 4.7 0 0 1 4.8 4.6 4.7 4.7 0 0 1 4.8-4.6c3 0 5.2 2.4 5.2 5.3 0 5.4-6.5 9.3-10 11.2C8.5 19.1 2 15.2 2 9.8c0-3 2.2-5.3 5.2-5.3Z"/></svg>
+          </span>
+          <span><strong>Nosso</strong> Plano</span>
+        </a>
+
+        <nav class="main-nav" aria-label="Navegação principal">
+          <button class="nav-item active" data-view="overview">
+            <svg viewBox="0 0 24 24"><path d="M4 13h6V4H4v9Zm0 7h6v-4H4v4Zm10 0h6v-9h-6v9Zm0-16v4h6V4h-6Z"/></svg>
+            Visão geral
+          </button>
+          <button class="nav-item" data-view="planning">
+            <svg viewBox="0 0 24 24"><path d="M7 3v3m10-3v3M4 9h16M5 5h14a1 1 0 0 1 1 1v14H4V6a1 1 0 0 1 1-1Z"/></svg>
+            Planejamento
+          </button>
+          <button class="nav-item" data-view="annual">
+            <svg viewBox="0 0 24 24"><path d="M5 20V10m7 10V4m7 16v-7"/></svg>
+            Visão anual
+          </button>
+          <button class="nav-item" data-view="payroll">
+            <svg viewBox="0 0 24 24"><path d="M5 3h14v18l-3-2-4 2-4-2-3 2V3Zm4 5h6M9 12h6"/></svg>
+            Descontos em folha
+          </button>
+        </nav>
+
+        <div class="sidebar-footer">
+          <div class="couple-mini">
+            <div class="avatar-stack"><span>V</span><span>N</span></div>
+            <div><strong id="sidebarNames">Você &amp; Noiva</strong><small>Plano compartilhado</small></div>
+          </div>
+          <button class="nav-item settings-trigger" id="openSettings">
+            <svg viewBox="0 0 24 24"><path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2.8 2.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6v.2h-4V21a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1L4.2 17l.1-.1a1.7 1.7 0 0 0 .3-1.9A1.7 1.7 0 0 0 3 14H2.8v-4H3a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9L4.2 7 7 4.2l.1.1a1.7 1.7 0 0 0 1.9.3 1.7 1.7 0 0 0 1-1.6v-.2h4V3a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1L19.8 7l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1h.2v4H21a1.7 1.7 0 0 0-1.6 1Z"/></svg>
+            Ajustes
+          </button>
+        </div>
+      </aside>
+
+      <main class="main">
+        <header class="topbar">
+          <button class="icon-button menu-button" id="menuButton" aria-label="Abrir menu">
+            <svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+          </button>
+          <div class="date-control">
+            <button class="icon-button" id="prevMonth" aria-label="Mês anterior"><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button>
+            <button class="current-month" id="monthPicker">
+              <span id="currentMonthLabel">Junho 2026</span>
+              <svg viewBox="0 0 24 24"><path d="m7 10 5 5 5-5"/></svg>
+            </button>
+            <button class="icon-button" id="nextMonth" aria-label="Próximo mês"><svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></button>
+            <div class="month-menu" id="monthMenu" hidden></div>
+          </div>
+          <div class="top-actions">
+            <span class="save-status"><i></i> Salvo</span>
+            <button class="account-button" id="authButton" type="button">
+              <svg viewBox="0 0 24 24"><path d="M20 21a8 8 0 0 0-16 0m8-10a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"/></svg>
+              <span>Entrar</span>
+            </button>
+            <button class="primary-button" data-action="add-entry">
+              <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+              Novo lançamento
+            </button>
+          </div>
+        </header>
+
+        <div class="page-content">
+          <section class="view active" id="view-overview">
+            <div class="welcome-row">
+              <div>
+                <p class="eyebrow">FINANÇAS DO CASAL</p>
+                <h1>Olá, <span id="welcomeNames">vocês dois</span> <span class="wave">♡</span></h1>
+                <p class="subtitle">O plano de vocês, claro e no mesmo lugar.</p>
+              </div>
+              <div class="month-goal" id="monthGoal">
+                <span>Meta do mês</span>
+                <strong id="goalProgress">0%</strong>
+              </div>
+            </div>
+
+            <div class="summary-grid">
+              <article class="summary-card income">
+                <div class="card-icon"><svg viewBox="0 0 24 24"><path d="M12 19V5m-5 5 5-5 5 5"/></svg></div>
+                <div><span>Receitas</span><strong id="summaryIncome">R$ 0,00</strong><small id="incomeHint">neste mês</small></div>
+              </article>
+              <article class="summary-card expense">
+                <div class="card-icon"><svg viewBox="0 0 24 24"><path d="M12 5v14m5-5-5 5-5-5"/></svg></div>
+                <div><span>Despesas</span><strong id="summaryExpenses">R$ 0,00</strong><small id="expenseHint">neste mês</small></div>
+              </article>
+              <article class="summary-card investment">
+                <div class="card-icon"><svg viewBox="0 0 24 24"><path d="M4 17 9 12l3 3 7-8M15 7h4v4"/></svg></div>
+                <div><span>Investimentos</span><strong id="summaryInvestments">R$ 0,00</strong><small id="investmentHint">0% da receita</small></div>
+              </article>
+              <article class="summary-card balance">
+                <div class="card-icon"><svg viewBox="0 0 24 24"><path d="M4 7h16v12H4V7Zm0 3h16M16 15h1"/></svg></div>
+                <div><span>Saldo disponível</span><strong id="summaryBalance">R$ 0,00</strong><small id="balanceHint">receitas − saídas</small></div>
+              </article>
+            </div>
+
+            <div class="dashboard-grid">
+              <article class="panel cashflow-panel">
+                <div class="panel-heading">
+                  <div><p class="eyebrow">FLUXO DO ANO</p><h2>Entradas e saídas</h2></div>
+                  <div class="chart-legend"><span><i class="income-dot"></i>Receitas</span><span><i class="expense-dot"></i>Despesas</span></div>
+                </div>
+                <div class="chart-wrap"><canvas id="cashflowChart"></canvas></div>
+              </article>
+
+              <article class="panel distribution-panel">
+                <div class="panel-heading">
+                  <div><p class="eyebrow">ONDE ESTÁ INDO</p><h2>Despesas por categoria</h2></div>
+                </div>
+                <div class="donut-area">
+                  <div class="donut" id="expenseDonut"><div><strong id="donutTotal">R$ 0</strong><span>em despesas</span></div></div>
+                  <div class="distribution-list" id="distributionList"></div>
+                </div>
+              </article>
+
+              <article class="panel quick-panel">
+                <div class="panel-heading"><div><p class="eyebrow">ATALHO RÁPIDO</p><h2>Atualize o mês</h2></div></div>
+                <div class="quick-list" id="quickList"></div>
+                <button class="text-button" data-view-link="planning">Ver planejamento completo <span>→</span></button>
+              </article>
+
+              <article class="panel insight-panel">
+                <div class="insight-icon">✦</div>
+                <p class="eyebrow">UM OLHAR SOBRE O MÊS</p>
+                <h2 id="insightTitle">Comecem pelo primeiro lançamento.</h2>
+                <p id="insightText">Ao preencher receitas e despesas, o plano mostra como o dinheiro de vocês está se distribuindo.</p>
+              </article>
+            </div>
+          </section>
+
+          <section class="view" id="view-planning">
+            <div class="section-title">
+              <div><p class="eyebrow">PLANEJAMENTO MENSAL</p><h1>Organizem o mês juntos</h1><p class="subtitle">Edite os valores abaixo. Tudo é calculado e salvo automaticamente.</p></div>
+              <button class="secondary-button" id="copyPrevious"><svg viewBox="0 0 24 24"><path d="M8 8h11v11H8V8Zm-3 8H4V4h12v1"/></svg> Copiar mês anterior</button>
+            </div>
+            <div class="planning-summary" id="planningSummary"></div>
+            <div class="planning-sections" id="planningSections"></div>
+          </section>
+
+          <section class="view" id="view-annual">
+            <div class="section-title">
+              <div><p class="eyebrow">VISÃO ANUAL</p><h1>O ano em perspectiva</h1><p class="subtitle" id="annualSubtitle">Acompanhem a evolução de 2026 mês a mês.</p></div>
+              <div class="year-selector"><button id="prevYear">−</button><strong id="yearLabel">2026</strong><button id="nextYear">+</button></div>
+            </div>
+            <div class="annual-cards" id="annualCards"></div>
+            <article class="panel annual-table-panel">
+              <div class="panel-heading"><div><p class="eyebrow">RESUMO COMPLETO</p><h2>Movimentação mensal</h2></div></div>
+              <div class="table-scroll"><table class="annual-table" id="annualTable"></table></div>
+            </article>
+          </section>
+
+          <section class="view" id="view-payroll">
+            <div class="section-title">
+              <div><p class="eyebrow">DESCONTOS EM FOLHA</p><h1>Do bruto ao que chega na conta</h1><p class="subtitle">Controle os valores descontados diretamente do salário.</p></div>
+            </div>
+            <div class="payroll-layout">
+              <article class="panel payroll-card">
+                <div class="panel-heading"><div><p class="eyebrow">MÊS SELECIONADO</p><h2 id="payrollMonth">Junho de 2026</h2></div><strong id="payrollTotal">R$ 0,00</strong></div>
+                <div id="payrollRows"></div>
+                <button class="add-row-button" id="addPayroll">+ Adicionar desconto</button>
+              </article>
+              <article class="panel payroll-note">
+                <div class="note-illustration"><span>R$</span></div>
+                <h2>Valores que não passam despercebidos.</h2>
+                <p>Esses descontos ficam separados das despesas do orçamento para evitar contar o mesmo valor duas vezes.</p>
+              </article>
+            </div>
+          </section>
+        </div>
+      </main>
+    </div>
+
+    <div class="modal-backdrop" id="entryModal" hidden>
+      <form class="modal" id="entryForm">
+        <div class="modal-heading"><div><p class="eyebrow">NOVO LANÇAMENTO</p><h2>Adicionar valor</h2></div><button type="button" class="icon-button close-modal" aria-label="Fechar">×</button></div>
+        <label>Tipo<select id="entryType"><option value="income">Receita</option><option value="expense">Despesa</option><option value="investment">Investimento</option></select></label>
+        <label>Categoria<select id="entryCategory"></select></label>
+        <label>Valor<div class="money-input large"><span>R$</span><input id="entryValue" inputmode="decimal" placeholder="0,00" required /></div></label>
+        <label>Responsável<select id="entryOwner"><option value="couple">Casal</option><option value="person1">Você</option><option value="person2">Noiva</option></select></label>
+        <button class="primary-button full" type="submit">Adicionar ao mês</button>
+      </form>
+    </div>
+
+    <div class="modal-backdrop" id="settingsModal" hidden>
+      <form class="modal" id="settingsForm">
+        <div class="modal-heading"><div><p class="eyebrow">AJUSTES</p><h2>O plano de vocês</h2></div><button type="button" class="icon-button close-modal" aria-label="Fechar">×</button></div>
+        <div class="photo-settings">
+          <label class="photo-upload">
+            <span class="photo-preview" id="person1PhotoPreview">V</span>
+            <strong>Sua foto</strong>
+            <small>Escolher imagem</small>
+            <input type="file" id="person1PhotoInput" accept="image/*" />
+          </label>
+          <label class="photo-upload">
+            <span class="photo-preview second" id="person2PhotoPreview">N</span>
+            <strong>Foto da sua noiva</strong>
+            <small>Escolher imagem</small>
+            <input type="file" id="person2PhotoInput" accept="image/*" />
+          </label>
+        </div>
+        <label>Seu nome<input id="person1Name" placeholder="Seu nome" /></label>
+        <label>Nome da sua noiva<input id="person2Name" placeholder="Nome dela" /></label>
+        <label>Meta mensal para investimentos<div class="money-input large"><span>R$</span><input id="goalValue" inputmode="decimal" placeholder="0,00" /></div></label>
+        <div class="settings-data">
+          <button type="button" class="secondary-button" id="exportData">Exportar dados</button>
+          <label class="secondary-button file-button">Importar dados<input type="file" id="importData" accept=".json" /></label>
+          <button type="button" class="danger-link" id="resetData">Limpar tudo</button>
+        </div>
+        <button class="primary-button full" type="submit">Salvar ajustes</button>
+      </form>
+    </div>
+
+    <div class="modal-backdrop login-backdrop" id="authModal">
+      <form class="modal login-card" id="authForm">
+        <div class="login-brand">
+          <span class="brand-mark">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7.2 4.5a4.7 4.7 0 0 1 4.8 4.6 4.7 4.7 0 0 1 4.8-4.6c3 0 5.2 2.4 5.2 5.3 0 5.4-6.5 9.3-10 11.2C8.5 19.1 2 15.2 2 9.8c0-3 2.2-5.3 5.2-5.3Z"/></svg>
+          </span>
+          <span><strong>Nosso</strong> Plano</span>
+        </div>
+        <div class="modal-heading">
+          <div><p class="eyebrow">FINANÇAS DO CASAL</p><h2 id="authTitle">Acesse o plano de vocês</h2></div>
+          <button type="button" class="icon-button close-modal" id="authCloseButton" aria-label="Fechar" hidden>×</button>
+        </div>
+        <div id="authSignedOut">
+          <p class="auth-intro">Usem o mesmo login nos dois aparelhos para compartilhar este orçamento.</p>
+          <label>E-mail<input id="authEmail" type="email" autocomplete="email" placeholder="casal@exemplo.com" required /></label>
+          <label>Senha<input id="authPassword" type="password" autocomplete="current-password" placeholder="Mínimo de 6 caracteres" minlength="6" required /></label>
+          <p class="auth-message" id="authMessage"></p>
+          <button class="primary-button full" id="signInButton" type="submit">Entrar e sincronizar</button>
+          <button class="secondary-button full" id="createAccountButton" type="button">Criar conta do casal</button>
+        </div>
+        <div class="auth-signed-in" id="authSignedIn" hidden>
+          <div class="cloud-success">
+            <span>✓</span>
+            <div><strong>Plano sincronizado</strong><small id="signedInEmail"></small></div>
+          </div>
+          <p>As alterações são salvas no Firebase e aparecem nos outros aparelhos conectados a esta conta.</p>
+          <button class="secondary-button full" id="signOutButton" type="button">Sair desta conta</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="toast" id="toast"></div>
+    <script src="app.js"></script>
+  </body>
+</html>
