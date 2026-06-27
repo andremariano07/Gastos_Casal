@@ -187,6 +187,7 @@ function totals(year = selectedYear, month = selectedMonth) {
 function renderAll() {
   renderHeader();
   renderOverview();
+  renderConsultant();
   renderPlanning();
   renderAnnual();
   renderPayroll();
@@ -323,6 +324,219 @@ function renderInsight(t) {
   }
   document.getElementById("insightTitle").textContent = title;
   document.getElementById("insightText").textContent = text;
+}
+
+function renderConsultant() {
+  const current = totals();
+  let previousMonth = selectedMonth - 1;
+  let previousYear = selectedYear;
+  if (previousMonth < 0) {
+    previousMonth = 11;
+    previousYear--;
+  }
+  const previous = totals(previousYear, previousMonth);
+  const hasIncome = current.income > 0;
+  const expenseRate = hasIncome ? current.expense / current.income : 0;
+  const investmentRate = hasIncome ? current.investment / current.income : 0;
+  const balanceRate = hasIncome ? current.balance / current.income : 0;
+  const recommendations = [];
+  let score = null;
+
+  if (!hasIncome) {
+    recommendations.push({
+      type: "danger",
+      icon: "!",
+      title: "Registrem as receitas do mês",
+      text: "Sem a renda mensal, o consultor não consegue medir quanto do orçamento já está comprometido."
+    });
+  } else {
+    score = 50;
+    if (expenseRate <= 0.6) score += 20;
+    else if (expenseRate <= 0.8) score += 10;
+    else if (expenseRate > 1) score -= 25;
+
+    if (investmentRate >= 0.2) score += 20;
+    else if (investmentRate >= 0.1) score += 12;
+    else if (investmentRate > 0) score += 5;
+    else score -= 5;
+
+    if (balanceRate >= 0.1) score += 10;
+    else if (current.balance >= 0) score += 5;
+    else score -= 20;
+    score = Math.max(0, Math.min(100, Math.round(score)));
+
+    if (current.balance < 0) {
+      recommendations.push({
+        type: "danger",
+        icon: "!",
+        title: "O orçamento ultrapassou a renda",
+        text: `As saídas estão ${money(Math.abs(current.balance))} acima das receitas. Priorizem a revisão das maiores despesas antes de assumir novos gastos.`
+      });
+    } else if (balanceRate >= 0.1) {
+      recommendations.push({
+        type: "success",
+        icon: "✓",
+        title: "Boa margem no fim do mês",
+        text: `${Math.round(balanceRate * 100)}% da renda continua livre depois das despesas e investimentos planejados.`
+      });
+    }
+
+    if (expenseRate > 0.8) {
+      recommendations.push({
+        type: "warning",
+        icon: "↘",
+        title: "Despesas consumindo grande parte da renda",
+        text: `${Math.round(expenseRate * 100)}% das receitas estão comprometidas com despesas. Uma faixa abaixo de 80% oferece mais espaço para imprevistos e metas.`
+      });
+    } else if (expenseRate <= 0.6) {
+      recommendations.push({
+        type: "success",
+        icon: "✓",
+        title: "Despesas sob controle",
+        text: `As despesas representam ${Math.round(expenseRate * 100)}% da renda deste mês, deixando uma margem confortável no planejamento.`
+      });
+    }
+
+    if (investmentRate < 0.1) {
+      recommendations.push({
+        type: "warning",
+        icon: "◇",
+        title: current.investment > 0 ? "Aumentem os investimentos aos poucos" : "Reservem uma parte para o futuro",
+        text: current.investment > 0
+          ? `Hoje vocês investem ${Math.round(investmentRate * 100)}% da renda. Se for possível, tentem aproximar essa parcela de 10%.`
+          : "Ainda não há investimentos planejados neste mês. Mesmo um valor pequeno ajuda a criar consistência."
+      });
+    } else {
+      recommendations.push({
+        type: "success",
+        icon: "◇",
+        title: "Ritmo de investimento saudável",
+        text: `${Math.round(investmentRate * 100)}% da renda está direcionada para investimentos neste mês.`
+      });
+    }
+  }
+
+  const expenseGroups = GROUPS
+    .filter(group => group.type === "expense")
+    .map(group => ({ title: group.title, total: current.groups[group.id] || 0 }))
+    .sort((a, b) => b.total - a.total);
+  const largest = expenseGroups[0];
+  if (largest?.total > 0 && current.expense > 0 && largest.total / current.expense >= 0.35) {
+    recommendations.push({
+      type: "warning",
+      icon: "◎",
+      title: `${largest.title} concentra os gastos`,
+      text: `${largest.title} representa ${Math.round(largest.total / current.expense * 100)}% das despesas (${money(largest.total)}). Vale conferir os itens dessa categoria.`
+    });
+  }
+
+  if (previous.expense > 0 && current.expense > 0) {
+    const change = (current.expense - previous.expense) / previous.expense;
+    if (change > 0.15) {
+      recommendations.push({
+        type: "warning",
+        icon: "↑",
+        title: "As despesas cresceram desde o mês passado",
+        text: `O total aumentou ${Math.round(change * 100)}% em relação a ${MONTHS[previousMonth]}. Confiram se esse aumento foi planejado.`
+      });
+    } else if (change < -0.1) {
+      recommendations.push({
+        type: "success",
+        icon: "↓",
+        title: "Vocês reduziram as despesas",
+        text: `Os gastos caíram ${Math.abs(Math.round(change * 100))}% em relação a ${MONTHS[previousMonth]}.`
+      });
+    }
+  }
+
+  if (state.settings.goal > 0) {
+    const goalProgress = current.investment / state.settings.goal;
+    recommendations.push(goalProgress >= 1 ? {
+      type: "success",
+      icon: "★",
+      title: "Meta de investimento alcançada",
+      text: `Vocês chegaram a ${money(current.investment)} e cumpriram a meta mensal de ${money(state.settings.goal)}.`
+    } : {
+      type: "warning",
+      icon: "→",
+      title: "Ainda dá para avançar na meta",
+      text: `Faltam ${money(state.settings.goal - current.investment)} para atingir a meta de investimentos deste mês.`
+    });
+  }
+
+  if (!recommendations.length) {
+    recommendations.push({
+      type: "success",
+      icon: "✓",
+      title: "Planejamento equilibrado",
+      text: "Não encontramos alertas importantes neste mês. Continuem atualizando os valores para manter a análise precisa."
+    });
+  }
+
+  const scoreElement = document.getElementById("healthScore");
+  const scoreValue = document.getElementById("healthScoreValue");
+  const status = document.getElementById("healthStatus");
+  scoreElement.style.setProperty("--score", `${score || 0}%`);
+  scoreValue.textContent = score ?? "—";
+  status.className = "health-status";
+
+  if (score === null) {
+    scoreElement.style.setProperty("--score-color", "var(--muted)");
+    document.getElementById("healthTitle").textContent = "Preencham o planejamento para começar";
+    document.getElementById("healthDescription").textContent = "O consultor usa receitas, despesas e investimentos para preparar uma análise personalizada.";
+    status.textContent = "Aguardando dados";
+  } else if (score >= 75) {
+    scoreElement.style.setProperty("--score-color", "var(--green)");
+    document.getElementById("healthTitle").textContent = "O mês está bem encaminhado";
+    document.getElementById("healthDescription").textContent = "O orçamento apresenta uma boa relação entre gastos, investimentos e saldo disponível.";
+    status.textContent = "Situação saudável";
+    status.classList.add("good");
+  } else if (score >= 50) {
+    scoreElement.style.setProperty("--score-color", "var(--gold)");
+    document.getElementById("healthTitle").textContent = "Alguns ajustes podem fortalecer o mês";
+    document.getElementById("healthDescription").textContent = "O plano está funcional, mas há oportunidades para aumentar a margem e reduzir riscos.";
+    status.textContent = "Pede atenção";
+    status.classList.add("attention");
+  } else {
+    scoreElement.style.setProperty("--score-color", "var(--coral)");
+    document.getElementById("healthTitle").textContent = "É hora de reorganizar algumas prioridades";
+    document.getElementById("healthDescription").textContent = "As saídas estão pressionando o orçamento. Comecem pelas recomendações de maior impacto.";
+    status.textContent = "Situação crítica";
+    status.classList.add("critical");
+  }
+
+  document.getElementById("tipCount").textContent = `${recommendations.length} ${recommendations.length === 1 ? "dica" : "dicas"}`;
+  document.getElementById("recommendationsList").innerHTML = recommendations.slice(0, 6).map(tip => `
+    <div class="recommendation ${tip.type}">
+      <span class="recommendation-icon">${tip.icon}</span>
+      <div><h3>${tip.title}</h3><p>${tip.text}</p></div>
+    </div>`).join("");
+
+  const indicators = [
+    {
+      label: "Renda comprometida",
+      value: hasIncome ? expenseRate * 100 : 0,
+      display: hasIncome ? `${Math.round(expenseRate * 100)}%` : "—",
+      color: expenseRate > 0.8 ? "var(--coral)" : "var(--green)"
+    },
+    {
+      label: "Taxa de investimento",
+      value: investmentRate * 100 / 20 * 100,
+      display: hasIncome ? `${Math.round(investmentRate * 100)}%` : "—",
+      color: investmentRate >= 0.1 ? "var(--green)" : "var(--gold)"
+    },
+    {
+      label: "Margem disponível",
+      value: Math.max(0, balanceRate * 100 / 20 * 100),
+      display: hasIncome ? `${Math.round(balanceRate * 100)}%` : "—",
+      color: current.balance < 0 ? "var(--coral)" : "var(--blue)"
+    }
+  ];
+  document.getElementById("consultantIndicators").innerHTML = indicators.map(item => `
+    <div class="indicator-row" style="--indicator-color:${item.color}">
+      <span>${item.label}</span><strong>${item.display}</strong>
+      <div class="indicator-track"><i style="--value:${Math.max(0, Math.min(100, item.value))}%"></i></div>
+    </div>`).join("");
 }
 
 function renderPlanning() {

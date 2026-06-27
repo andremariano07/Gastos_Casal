@@ -25,6 +25,10 @@
             <svg viewBox="0 0 24 24"><path d="M4 13h6V4H4v9Zm0 7h6v-4H4v4Zm10 0h6v-9h-6v9Zm0-16v4h6V4h-6Z"/></svg>
             Visão geral
           </button>
+          <button class="nav-item" data-view="consultant">
+            <svg viewBox="0 0 24 24"><path d="m12 3 1.7 4.3L18 9l-4.3 1.7L12 15l-1.7-4.3L6 9l4.3-1.7L12 3Zm6 12 .9 2.1L21 18l-2.1.9L18 21l-.9-2.1L15 18l2.1-.9L18 15Z"/></svg>
+            Consultor
+          </button>
           <button class="nav-item" data-view="planning">
             <svg viewBox="0 0 24 24"><path d="M7 3v3m10-3v3M4 9h16M5 5h14a1 1 0 0 1 1 1v14H4V6a1 1 0 0 1 1-1Z"/></svg>
             Planejamento
@@ -142,6 +146,54 @@
                 <h2 id="insightTitle">Comecem pelo primeiro lançamento.</h2>
                 <p id="insightText">Ao preencher receitas e despesas, o plano mostra como o dinheiro de vocês está se distribuindo.</p>
               </article>
+            </div>
+          </section>
+
+          <section class="view" id="view-consultant">
+            <div class="section-title consultant-title">
+              <div>
+                <div class="consultant-kicker"><span>✦</span> GRATUITO · ANÁLISE LOCAL</div>
+                <h1>Consultor financeiro</h1>
+                <p class="subtitle">Uma leitura automática do orçamento, sem enviar seus dados para serviços externos.</p>
+              </div>
+              <button class="secondary-button" data-view-link="planning">
+                <svg viewBox="0 0 24 24"><path d="M4 13h6V4H4v9Zm0 7h6v-4H4v4Zm10 0h6v-9h-6v9Zm0-16v4h6V4h-6Z"/></svg>
+                Ajustar planejamento
+              </button>
+            </div>
+
+            <div class="consultant-hero panel">
+              <div class="health-score" id="healthScore">
+                <div><strong id="healthScoreValue">—</strong><span>de 100</span></div>
+              </div>
+              <div class="health-copy">
+                <p class="eyebrow">SAÚDE FINANCEIRA DO MÊS</p>
+                <h2 id="healthTitle">Preencham o planejamento para começar</h2>
+                <p id="healthDescription">O consultor usa receitas, despesas e investimentos para preparar uma análise personalizada.</p>
+              </div>
+              <div class="health-status" id="healthStatus">Aguardando dados</div>
+            </div>
+
+            <div class="consultant-layout">
+              <article class="panel recommendations-panel">
+                <div class="panel-heading">
+                  <div><p class="eyebrow">RECOMENDAÇÕES DO MÊS</p><h2>Próximos passos</h2></div>
+                  <span class="tip-count" id="tipCount">0 dicas</span>
+                </div>
+                <div class="recommendations-list" id="recommendationsList"></div>
+              </article>
+
+              <div class="consultant-side">
+                <article class="panel indicator-panel">
+                  <div class="panel-heading"><div><p class="eyebrow">INDICADORES</p><h2>Como vocês estão</h2></div></div>
+                  <div class="indicator-list" id="consultantIndicators"></div>
+                </article>
+                <article class="panel consultant-note">
+                  <span class="note-spark">✦</span>
+                  <h2>Análise privada e sem custo</h2>
+                  <p>As recomendações são calculadas neste navegador. Nenhum dado financeiro é enviado para uma inteligência artificial.</p>
+                </article>
+              </div>
             </div>
           </section>
 
