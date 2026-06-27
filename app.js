@@ -580,13 +580,18 @@ function optimizePhoto(file) {
       image.onload = () => {
         const size = Math.min(image.naturalWidth, image.naturalHeight);
         const sourceX = (image.naturalWidth - size) / 2;
-        const sourceY = (image.naturalHeight - size) / 2;
+        // Em fotos verticais, prioriza a parte superior, onde normalmente está o rosto.
+        const sourceY = image.naturalHeight > image.naturalWidth
+          ? (image.naturalHeight - size) * 0.28
+          : (image.naturalHeight - size) / 2;
         const canvas = document.createElement("canvas");
-        canvas.width = 240;
-        canvas.height = 240;
+        canvas.width = 320;
+        canvas.height = 320;
         const context = canvas.getContext("2d");
-        context.drawImage(image, sourceX, sourceY, size, size, 0, 0, 240, 240);
-        resolve(canvas.toDataURL("image/jpeg", 0.78));
+        context.imageSmoothingEnabled = true;
+        context.imageSmoothingQuality = "high";
+        context.drawImage(image, sourceX, sourceY, size, size, 0, 0, 320, 320);
+        resolve(canvas.toDataURL("image/jpeg", 0.84));
       };
       image.src = reader.result;
     };

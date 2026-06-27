@@ -44,8 +44,8 @@ svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width:
 .couple-mini strong { font-size: 12px; }
 .couple-mini small { color: var(--muted); font-size: 10px; margin-top: 2px; }
 .avatar-stack { display: flex; }
-.avatar-stack span { width: 27px; height: 27px; display: grid; place-items: center; border-radius: 50%; color: white; background: var(--green); border: 2px solid #f9f7f2; font-size: 10px; font-weight: 700; }
-.avatar-stack span + span { margin-left: -8px; background: var(--coral); }
+.avatar-stack span { width: 34px; height: 34px; flex: 0 0 34px; display: grid; place-items: center; border-radius: 50%; color: white; background-color: var(--green); background-position: center; background-repeat: no-repeat; background-size: cover; border: 2px solid #f9f7f2; font-size: 10px; font-weight: 700; box-shadow: 0 2px 7px rgba(32, 49, 45, .12); }
+.avatar-stack span + span { margin-left: -7px; background-color: var(--coral); }
 .settings-trigger { padding-block: 9px; }
 
 .main { margin-left: 250px; width: calc(100% - 250px); min-width: 0; }
