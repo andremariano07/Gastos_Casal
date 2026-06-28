@@ -187,7 +187,7 @@ h2 { font-size: 18px; }
 .consultant-note p { margin: 10px 0 0; color: #c8d9d3; font-size: 11px; line-height: 1.6; }
 
 .section-title { align-items: center; }
-.planning-summary { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; overflow: hidden; margin-bottom: 20px; border: 1px solid var(--line); border-radius: 15px; background: var(--line); }
+.planning-summary { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1px; overflow: hidden; margin-bottom: 20px; border: 1px solid var(--line); border-radius: 15px; background: var(--line); }
 .plan-stat { padding: 15px 18px; background: var(--surface); }
 .plan-stat span, .plan-stat strong { display: block; }
 .plan-stat span { color: var(--muted); font-size: 10px; }

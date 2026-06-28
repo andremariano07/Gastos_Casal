@@ -172,7 +172,7 @@ function setValue(groupId, index, value) {
   renderAll();
 }
 
-function totals(year = selectedYear, month = selectedMonth) {
+function rawTotals(year = selectedYear, month = selectedMonth) {
   const result = { income: 0, expense: 0, investment: 0, payroll: 0, groups: {} };
   GROUPS.forEach(group => {
     const total = getItems(group).reduce((sum, _, index) => sum + getValue(group.id, index, year, month), 0);
@@ -180,7 +180,27 @@ function totals(year = selectedYear, month = selectedMonth) {
     result.groups[group.id] = total;
   });
   result.payroll = (state.payroll[key(year, month)] || []).reduce((sum, row) => sum + Number(row.value || 0), 0);
-  result.balance = result.income - result.expense - result.investment;
+  result.monthBalance = result.income - result.expense - result.investment;
+  return result;
+}
+
+function openingBalance(year = selectedYear, month = selectedMonth) {
+  const targetIndex = year * 12 + month;
+  return Object.keys(state.values).reduce((balance, monthKey) => {
+    const match = /^(\d{4})-(\d{2})$/.exec(monthKey);
+    if (!match) return balance;
+    const entryYear = Number(match[1]);
+    const entryMonth = Number(match[2]) - 1;
+    const entryIndex = entryYear * 12 + entryMonth;
+    if (entryIndex >= targetIndex) return balance;
+    return balance + rawTotals(entryYear, entryMonth).monthBalance;
+  }, 0);
+}
+
+function totals(year = selectedYear, month = selectedMonth) {
+  const result = rawTotals(year, month);
+  result.openingBalance = openingBalance(year, month);
+  result.balance = result.openingBalance + result.monthBalance;
   return result;
 }
 
@@ -225,6 +245,9 @@ function renderOverview() {
   document.querySelector(".summary-card.balance").classList.toggle("negative", t.balance < 0);
   document.getElementById("investmentHint").textContent = `${t.income ? Math.round(t.investment / t.income * 100) : 0}% da receita`;
   document.getElementById("expenseHint").textContent = `${t.income ? Math.round(t.expense / t.income * 100) : 0}% da receita`;
+  document.getElementById("balanceHint").textContent = t.openingBalance
+    ? `inclui ${money(t.openingBalance)} do mês anterior`
+    : "receitas − saídas";
   const goalPct = state.settings.goal ? Math.min(999, Math.round(t.investment / state.settings.goal * 100)) : 0;
   document.getElementById("goalProgress").textContent = `${goalPct}%`;
   document.getElementById("monthGoal").title = state.settings.goal ? `Meta: ${money(state.settings.goal)}` : "Defina uma meta nos ajustes";
@@ -311,10 +334,15 @@ function roundRect(ctx, x, y, w, h, r, color) {
 function renderInsight(t) {
   let title = "Comecem pelo primeiro lançamento.";
   let text = "Ao preencher receitas e despesas, o plano mostra como o dinheiro de vocês está se distribuindo.";
-  if (t.income > 0 && t.balance >= 0) {
+  if (t.openingBalance !== 0 && t.income === 0 && t.expense === 0 && t.investment === 0) {
+    title = `${money(t.openingBalance)} vieram do mês anterior.`;
+    text = "Esse valor já está disponível para o planejamento deste mês.";
+  } else if (t.income > 0 && t.balance >= 0) {
     const available = Math.round(t.balance / t.income * 100);
     title = `Vocês ainda têm ${money(t.balance)} livres neste mês.`;
-    text = `${available}% da renda está disponível depois das despesas e dos investimentos planejados.`;
+    text = t.openingBalance
+      ? `O valor inclui ${money(t.openingBalance)} trazidos do mês anterior.`
+      : `${available}% da renda está disponível depois das despesas e dos investimentos planejados.`;
   } else if (t.balance < 0) {
     title = `O planejamento ultrapassou a receita em ${money(Math.abs(t.balance))}.`;
     text = "Vale revisar as maiores categorias de despesa antes de fechar o mês.";
@@ -338,7 +366,7 @@ function renderConsultant() {
   const hasIncome = current.income > 0;
   const expenseRate = hasIncome ? current.expense / current.income : 0;
   const investmentRate = hasIncome ? current.investment / current.income : 0;
-  const balanceRate = hasIncome ? current.balance / current.income : 0;
+  const balanceRate = hasIncome ? current.monthBalance / current.income : 0;
   const recommendations = [];
   let score = null;
 
@@ -361,16 +389,16 @@ function renderConsultant() {
     else score -= 5;
 
     if (balanceRate >= 0.1) score += 10;
-    else if (current.balance >= 0) score += 5;
+    else if (current.monthBalance >= 0) score += 5;
     else score -= 20;
     score = Math.max(0, Math.min(100, Math.round(score)));
 
-    if (current.balance < 0) {
+    if (current.monthBalance < 0) {
       recommendations.push({
         type: "danger",
         icon: "!",
         title: "O orçamento ultrapassou a renda",
-        text: `As saídas estão ${money(Math.abs(current.balance))} acima das receitas. Priorizem a revisão das maiores despesas antes de assumir novos gastos.`
+        text: `As saídas deste mês estão ${money(Math.abs(current.monthBalance))} acima das receitas. Priorizem a revisão das maiores despesas antes de assumir novos gastos.`
       });
     } else if (balanceRate >= 0.1) {
       recommendations.push({
@@ -529,7 +557,7 @@ function renderConsultant() {
       label: "Margem disponível",
       value: Math.max(0, balanceRate * 100 / 20 * 100),
       display: hasIncome ? `${Math.round(balanceRate * 100)}%` : "—",
-      color: current.balance < 0 ? "var(--coral)" : "var(--blue)"
+      color: current.monthBalance < 0 ? "var(--coral)" : "var(--blue)"
     }
   ];
   document.getElementById("consultantIndicators").innerHTML = indicators.map(item => `
@@ -542,7 +570,7 @@ function renderConsultant() {
 function renderPlanning() {
   const t = totals();
   document.getElementById("planningSummary").innerHTML = [
-    ["Receitas", t.income], ["Investimentos", t.investment], ["Despesas", t.expense], ["Saldo", t.balance]
+    ["Saldo anterior", t.openingBalance], ["Receitas", t.income], ["Investimentos", t.investment], ["Despesas", t.expense], ["Saldo disponível", t.balance]
   ].map(([label, value]) => `<div class="plan-stat"><span>${label}</span><strong>${money(value)}</strong></div>`).join("");
 
   document.getElementById("planningSections").innerHTML = GROUPS.map(group => {
@@ -582,8 +610,9 @@ function renderAnnual() {
   document.getElementById("annualSubtitle").textContent = `Acompanhem a evolução de ${selectedYear} mês a mês.`;
   const months = MONTHS.map((_, month) => totals(selectedYear, month));
   const annual = months.reduce((sum, t) => {
-    sum.income += t.income; sum.expense += t.expense; sum.investment += t.investment; sum.balance += t.balance; return sum;
+    sum.income += t.income; sum.expense += t.expense; sum.investment += t.investment; return sum;
   }, { income: 0, expense: 0, investment: 0, balance: 0 });
+  annual.balance = months[11].balance;
   const cards = [
     ["Receitas no ano", annual.income, "Tudo que entrou"],
     ["Despesas no ano", annual.expense, "Sem contar investimentos"],
@@ -596,7 +625,9 @@ function renderAnnual() {
   ];
   document.getElementById("annualTable").innerHTML = `<thead><tr><th>Movimentação</th>${SHORT_MONTHS.map(m => `<th>${m}</th>`).join("")}<th>Total</th></tr></thead>
     <tbody>${rows.map(([label, field]) => {
-      const total = months.reduce((sum, m) => sum + m[field], 0);
+      const total = field === "balance"
+        ? months[11].balance
+        : months.reduce((sum, m) => sum + m[field], 0);
       return `<tr><td>${label}</td>${months.map(m => `<td class="${field === "balance" ? (m[field] < 0 ? "negative" : "positive") : ""}">${compactMoney(m[field])}</td>`).join("")}<td class="${field === "balance" ? (total < 0 ? "negative" : "positive") : ""}">${compactMoney(total)}</td></tr>`;
     }).join("")}</tbody>`;
 }
